@@ -17,11 +17,14 @@ from streamlit_drawable_canvas import st_canvas
 from svgpathtools import parse_path
 import pytesseract
 import platform
-
+from code_editor import code_editor
 with open( "styles.css" ) as css:
     st.markdown( f'<style>{css.read()}</style>' , unsafe_allow_html= True)
-# Obtener el nombre del sistema operativo
-system_name = platform.system()
+
+
+def update_canvas():
+  st.session_state.canvas = st.session_state.canvas
+
 
 
 
@@ -40,6 +43,7 @@ bg_image = st.sidebar.file_uploader("Background image:", type=["png", "jpg"])
 realtime_update = st.sidebar.checkbox("Update in realtime", True)
 
 # Create a canvas component
+
 canvas_result = st_canvas(
     fill_color="rgba(255, 165, 0, 0.3)",  # Fixed fill color with some opacity
     stroke_width=stroke_width,
@@ -52,11 +56,14 @@ canvas_result = st_canvas(
     drawing_mode=drawing_mode,
     point_display_radius=point_display_radius if drawing_mode == "point" else 0,
     display_toolbar=st.sidebar.checkbox("Display toolbar", True),
-    key="full_app",
+    key="canvas",
 )
+
+
 
 # Do something interesting with the image data and paths
 if canvas_result.image_data is not None:
+    #update_canvas()
     st.write('## Texto:')
     r = pytesseract.image_to_string(canvas_result.image_data,lang="spa")
 
@@ -68,4 +75,149 @@ if canvas_result.image_data is not None:
 #    st.dataframe(objects)
 
 
+st.experimental_memo
+code1 = r'''
+'''
 
+code1 = code1+r
+bts = [
+ {
+   "name": "Copy",
+   "feather": "Copy",
+   "hasText": True,
+   "alwaysOn": True,
+   "commands": ["copyAll"],
+   "style": {"top": "0.46rem", "right": "0.4rem"}
+ },
+ {
+   "name": "Shortcuts",
+   "feather": "Type",
+   "class": "shortcuts-button",
+   "hasText": True,
+   "commands": ["toggleKeyboardShortcuts"],
+   "style": {"bottom": "calc(50% + 1.75rem)", "right": "0.4rem"}
+ },
+ {
+   "name": "Collapse",
+   "feather": "Minimize2",
+   "hasText": True,
+   "commands": ["selectall",
+                "toggleSplitSelectionIntoLines",
+                "gotolinestart",
+                "gotolinestart",
+                "backspace"],
+   "style": {"bottom": "calc(50% - 1.25rem)", "right": "0.4rem"}
+ },
+ {
+   "name": "Guardar",
+   "feather": "Save",
+   "hasText": True,
+   "commands": ["save-state", ["response","saved"]],
+   "response": "saved",
+   "style": {"bottom": "calc(50% - 4.25rem)", "right": "0.4rem"}
+ },
+ {
+   "name": "Ejecutar",
+   "feather": "Play",
+   "primary": True,
+   "hasText": True,
+   "showWithIcon": True,
+   "commands": ["submit"],
+   "style": {"bottom": "0.44rem", "right": "0.4rem"}
+ },
+ {
+   "name": "Comandos",
+   "feather": "Terminal",
+   "primary": True,
+   "hasText": True,
+   "commands": ["openCommandPallete"],
+   "style": {"bottom": "3.5rem", "right": "0.4rem"}
+ }
+]
+
+css_string = '''
+background-color: #bee1e5;
+
+body > #root .ace-streamlit-dark~& {
+   background-color: #262830;
+}
+
+.ace-streamlit-dark~& span {
+   color: #fff;
+   opacity: 0.6;
+}
+
+span {
+   color: #000;
+   opacity: 0.5;
+}
+
+.code_editor-info.message {
+   width: inherit;
+   margin-right: 75px;
+   order: 2;
+   text-align: center;
+   opacity: 0;
+   transition: opacity 0.7s ease-out;
+}
+
+.code_editor-info.message.show {
+   opacity: 0.6;
+}
+
+.ace-streamlit-dark~& .code_editor-info.message.show {
+   opacity: 0.5;
+}
+'''
+# create info bar dictionary
+info_bar = {
+  "name": "language info",
+  "css": css_string,
+  "style": {
+            "order": "1",
+            "display": "flex",
+            "flexDirection": "row",
+            "alignItems": "center",
+            "width": "100%",
+            "height": "2.5rem",
+            "padding": "0rem 0.75rem",
+            "borderRadius": "8px 8px 0px 0px",
+            "zIndex": "9993"
+           },
+  "info": [{
+            "name": "python",
+            "style": {"width": "100px"}
+           }]
+}
+# CSS string for Code Editor
+css_string2 = '''
+font-weight: 600;
+&.streamlit_code-editor .ace-streamlit-dark.ace_editor {
+  background-color: #111827;
+  color: rgb(255, 255, 255);
+}
+&.streamlit_code-editor .ace-streamlit-light.ace_editor {
+        background-color: #eeeeee;
+        color: rgb(0, 0, 0);
+}
+'''
+# style dict for Ace Editor
+ace_style = {"borderRadius": "0px 0px 8px 8px"}
+
+# style dict for Code Editor
+code_style = {"width": "100%"}
+editor0 = code_editor(code1,theme="contrast",buttons=bts,lang='python',height=[15, 30],focus=True,info=info_bar,props={"style": ace_style}, component_props={"style": code_style, "css": css_string2})
+
+
+
+
+if editor0['type'] == "saved" and len(editor0['text']) != 0:
+    filename = st.text_input('Ingrese el nombre del archivo ','example')
+    st.download_button(
+        label="Descargar",
+        data=editor0['text'],
+        file_name=filename,
+        mime='text/python',)
+
+
+#st.session_state
