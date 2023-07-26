@@ -18,12 +18,11 @@ from svgpathtools import parse_path
 import pytesseract
 import platform
 from code_editor import code_editor
+from streamlit_server_state import server_state, server_state_lock
+
+
 with open( "styles.css" ) as css:
     st.markdown( f'<style>{css.read()}</style>' , unsafe_allow_html= True)
-
-
-def update_canvas():
-  st.session_state.canvas = st.session_state.canvas
 
 
 
@@ -43,6 +42,13 @@ bg_image = st.sidebar.file_uploader("Background image:", type=["png", "jpg"])
 realtime_update = st.sidebar.checkbox("Update in realtime", True)
 
 # Create a canvas component
+with server_state_lock["canvas"]:  # Lock the "count" state for thread-safety
+    if "canvas" not in server_state:
+        server_state.canvas = None
+
+
+
+
 
 canvas_result = st_canvas(
     fill_color="rgba(255, 165, 0, 0.3)",  # Fixed fill color with some opacity
@@ -61,6 +67,13 @@ canvas_result = st_canvas(
 
 
 
+
+
+if st.button('Update'):
+  with server_state_lock.canvas:
+        server_state.canvas =  canvas_result.image_data
+        canvas_result.background_image = server_state.canvas
+
 # Do something interesting with the image data and paths
 if canvas_result.image_data is not None:
     #update_canvas()
@@ -68,18 +81,15 @@ if canvas_result.image_data is not None:
     r = pytesseract.image_to_string(canvas_result.image_data,lang="spa")
 
     st.write(r)
-#if canvas_result.json_data is not None:
-#    objects = pd.json_normalize(canvas_result.json_data["objects"])
-#    for col in objects.select_dtypes(include=["object"]).columns:
-#        objects[col] = objects[col].astype("str")
-#    st.dataframe(objects)
 
 
-st.experimental_memo
+
 code1 = r'''
 '''
-
 code1 = code1+r
+
+st.session_state["edit"] = code1
+
 bts = [
  {
    "name": "Copy",
@@ -206,7 +216,10 @@ ace_style = {"borderRadius": "0px 0px 8px 8px"}
 
 # style dict for Code Editor
 code_style = {"width": "100%"}
-editor0 = code_editor(code1,theme="contrast",buttons=bts,lang='python',height=[15, 30],focus=True,info=info_bar,props={"style": ace_style}, component_props={"style": code_style, "css": css_string2})
+editor0 = code_editor(st.session_state.edit,theme="contrast",buttons=bts,lang='python',height=[15, 30],focus=True,info=info_bar,props={"style": ace_style}, component_props={"style": code_style, "css": css_string2})
+
+if st.session_state.edit != code1:
+  st.session_state.edit = st.session_state.edit +code1
 
 
 
