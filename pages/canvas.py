@@ -46,7 +46,6 @@ realtime_update = st.sidebar.checkbox("Update in realtime", True)
 
 
 canvas_result = st_canvas(
-        initial_drawing=server_state.paint,
         fill_color="rgba(255, 165, 0, 0.3)",  # Fixed fill color with some opacity
         stroke_width=stroke_width,
         stroke_color=stroke_color,
@@ -60,12 +59,6 @@ canvas_result = st_canvas(
         display_toolbar=st.sidebar.checkbox("Display toolbar", True),
         key="canvas",
       )
-
-with server_state_lock["paint"]:  # Lock the "count" state for thread-safety
-
-  if "paint" not in server_state:
-    server_state.paint = canvas_result.json_data
-
 
 
 
