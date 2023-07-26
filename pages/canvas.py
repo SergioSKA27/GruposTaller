@@ -25,10 +25,6 @@ system_name = platform.system()
 
 
 
-try:
-    os.system("apt-get install tesseract-ocr tesseract-ocr-spa")
-except:
-    pass
 
 # Specify canvas parameters in application
 drawing_mode = st.sidebar.selectbox(

@@ -6,7 +6,7 @@ import plotly.express as px
 import plotly.graph_objects as go
 import os
 
-os.system("apt-get install tesseract-ocr tesseract-ocr-spa")
+#os.system("apt-get install tesseract-ocr tesseract-ocr-spa")
 
 st.title('Teoria de Grupos')
 with open( "styles.css" ) as css:
