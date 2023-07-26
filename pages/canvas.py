@@ -18,7 +18,7 @@ from svgpathtools import parse_path
 import pytesseract
 import platform
 from code_editor import code_editor
-from streamlit_server_state import server_state, server_state_lock
+from streamlit_server_state import server_state, server_state_lock,force_rerun_bound_sessions
 
 
 with open( "styles.css" ) as css:
@@ -45,10 +45,8 @@ realtime_update = st.sidebar.checkbox("Update in realtime", True)
 
 
 
-
-
-with server_state_lock["canvas"]:  # Lock the "count" state for thread-safety
-  canvas_result = st_canvas(
+canvas_result = st_canvas(
+        initial_drawing=server_state.paint,
         fill_color="rgba(255, 165, 0, 0.3)",  # Fixed fill color with some opacity
         stroke_width=stroke_width,
         stroke_color=stroke_color,
@@ -61,10 +59,20 @@ with server_state_lock["canvas"]:  # Lock the "count" state for thread-safety
         point_display_radius=point_display_radius if drawing_mode == "point" else 0,
         display_toolbar=st.sidebar.checkbox("Display toolbar", True),
         key="canvas",
-    )
+      )
 
-  if "canvas" not in server_state:
-      server_state.canvas = canvas_result
+with server_state_lock["paint"]:  # Lock the "count" state for thread-safety
+
+  if "paint" not in server_state:
+    server_state.paint = canvas_result.json_data
+
+
+
+
+
+
+
+
 
 
 
