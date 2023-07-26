@@ -9,10 +9,23 @@ import base64
 
 #os.system("apt-get install tesseract-ocr tesseract-ocr-spa")
 
-st.title('Teoria de Grupos')
+#st.title('Teoria de Grupos')
 with open( "styles.css" ) as css:
     st.markdown( f'<style>{css.read()}</style>' , unsafe_allow_html= True)
 
+
+file_ = open("groups.gif", "rb")
+
+
+
+contents = file_.read()
+data_url = base64.b64encode(contents).decode("utf-8")
+file_.close()
+
+st.markdown(
+    f'<div style="text-align: center;"><img src="data:image/gif;base64,{data_url}" alt="galois"></div>',
+    unsafe_allow_html=True,
+)
 
 
 
