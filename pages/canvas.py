@@ -42,37 +42,37 @@ bg_image = st.sidebar.file_uploader("Background image:", type=["png", "jpg"])
 realtime_update = st.sidebar.checkbox("Update in realtime", True)
 
 # Create a canvas component
+
+
+
+
+
 with server_state_lock["canvas"]:  # Lock the "count" state for thread-safety
-    if "canvas" not in server_state:
-        server_state.canvas = None
+  canvas_result = st_canvas(
+        fill_color="rgba(255, 165, 0, 0.3)",  # Fixed fill color with some opacity
+        stroke_width=stroke_width,
+        stroke_color=stroke_color,
+        background_color=bg_color,
+        background_image=Image.open(bg_image) if bg_image else None,
+        update_streamlit=realtime_update,
+        height=600,
+        width=600,
+        drawing_mode=drawing_mode,
+        point_display_radius=point_display_radius if drawing_mode == "point" else 0,
+        display_toolbar=st.sidebar.checkbox("Display toolbar", True),
+        key="canvas",
+    )
+
+  if "canvas" not in server_state:
+      server_state.canvas = canvas_result
 
 
 
 
 
-canvas_result = st_canvas(
-    fill_color="rgba(255, 165, 0, 0.3)",  # Fixed fill color with some opacity
-    stroke_width=stroke_width,
-    stroke_color=stroke_color,
-    background_color=bg_color,
-    background_image=Image.open(bg_image) if bg_image else None,
-    update_streamlit=realtime_update,
-    height=600,
-    width=600,
-    drawing_mode=drawing_mode,
-    point_display_radius=point_display_radius if drawing_mode == "point" else 0,
-    display_toolbar=st.sidebar.checkbox("Display toolbar", True),
-    key="canvas",
-)
 
 
 
-
-
-if st.button('Update'):
-  with server_state_lock.canvas:
-        server_state.canvas =  canvas_result.image_data
-        canvas_result.background_image = server_state.canvas
 
 # Do something interesting with the image data and paths
 if canvas_result.image_data is not None:
@@ -81,6 +81,8 @@ if canvas_result.image_data is not None:
     r = pytesseract.image_to_string(canvas_result.image_data,lang="spa")
 
     st.write(r)
+else :
+  r = ''
 
 
 
@@ -233,4 +235,6 @@ if editor0['type'] == "saved" and len(editor0['text']) != 0:
         mime='text/python',)
 
 
-#st.session_state
+st.subheader('Preview')
+
+st.write(editor0['text'])
