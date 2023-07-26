@@ -35,7 +35,7 @@ stroke_width = st.sidebar.slider("Stroke width: ", 1, 25, 3)
 if drawing_mode == "point":
     point_display_radius = st.sidebar.slider("Point display radius: ", 1, 25, 3)
 stroke_color = st.sidebar.color_picker("Stroke color hex: ")
-bg_color = st.sidebar.color_picker("Background color hex: ", "#eee")
+bg_color = st.sidebar.color_picker("Background color hex: ", "#ffffff")
 bg_image = st.sidebar.file_uploader("Background image:", type=["png", "jpg"])
 realtime_update = st.sidebar.checkbox("Update in realtime", True)
 
@@ -57,11 +57,15 @@ canvas_result = st_canvas(
 
 # Do something interesting with the image data and paths
 if canvas_result.image_data is not None:
+    st.write('## Texto:')
     r = pytesseract.image_to_string(canvas_result.image_data,lang="spa")
 
-    st.write(r,1)
+    st.write(r)
 #if canvas_result.json_data is not None:
 #    objects = pd.json_normalize(canvas_result.json_data["objects"])
 #    for col in objects.select_dtypes(include=["object"]).columns:
 #        objects[col] = objects[col].astype("str")
 #    st.dataframe(objects)
+
+
+
