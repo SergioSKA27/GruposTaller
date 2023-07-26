@@ -10,4 +10,3 @@ streamlit-code-editor==0.1.8
 pytesseract==0.3.10
 
 
-
