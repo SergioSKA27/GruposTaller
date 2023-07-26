@@ -8,3 +8,5 @@ import plotly.graph_objects as go
 
 
 st.title('Teoria de Grupos')
+with open( "styles.css" ) as css:
+    st.markdown( f'<style>{css.read()}</style>' , unsafe_allow_html= True)
