@@ -7,13 +7,57 @@ import plotly.graph_objects as go
 import sympy as sp
 import re
 from itertools import permutations
-st.subheader(':triangular_ruler:')
+
+
+
+
+
+
+
 
 with open( "styles.css" ) as css:
     st.markdown( f'<style>{css.read()}</style>' , unsafe_allow_html= True)
+st.title(':blue[Grupoides]')
+r'''
+**Definición (grupoide o magma):**
+Un grupoide es un par $(G,\mu)$ que consiste en un conjunto G no vacío, llamado portador,
+y una operación binaria
+
+$$\mu: G \times G \rightarrow G$$,en $G$, tal que es cerrada.
 
 
+
+**Definición (Igualdad de groupoides):**
+Dos grupos son iguales si y solo si tienen los mismos conjuntos portadores y la misma operación binaria.
+
+
+Recuerde, una operación binaria se definió como un mapeo y dos asignaciones
+son iguales si y solo si tienen el mismo dominio y codominio, y la imagen de cada elemento es la misma al aplicar
+cualquiera de los dos mapeos.
+
+**Definición (groupoide conmutativo):**
+Un grupoide conmutativo es un grupoide $(G,\mu)$ tal que $(a,b)_\mu=(b,a)_\mu$, para todo $a,b \in G$.
+
+**Definición (groupoide asociativo):**
+Un grupoide asociativo es un grupoide $(G,\mu)$ tal que $((a,b)_\mu,c)_\mu = (a,(b,c)_\mu)_\mu$ para todo $a,b,c \in G$.
+
+**Definición (orden de un groupoide):**
+El orden de un groupoide $(G,\mu)$ es el número de elementos de $G$ denotado por $|G|$; $(G,\mu)$  es infinito si $|G|$
+es infinito y es finito si $|G|$ es finito.
+
+'''
+st.subheader(':triangular_ruler:')
 def is_conmutative(sett,op):
+    """
+    The function `is_conmutative` checks if a given set with a binary operation is commutative.
+
+    :param sett: The parameter "sett" represents a set of elements that form a groupoid. It could be a list, tuple, or any
+    other iterable containing the elements of the set
+    :param op: The parameter "op" represents the binary operation that is being performed on the elements of the set "sett"
+    :return: The function is_conmutative returns a tuple containing a boolean value and a string. The boolean value
+    indicates whether the groupoid is commutative or not, and the string contains logs or messages related to the
+    commutativity of the groupoid.
+    """
     logs = ''
     for i in range(len(sett)):
         for j in range(len(sett)):
@@ -23,8 +67,33 @@ def is_conmutative(sett,op):
                     logs += 'El grupoide no es conmutativo: \n'
                     logs +=r'$( '+ str(sett[i])+','+str(sett[j])+')_\mu  \noteq  '+r'( '+ str(sett[j])+','+str(sett[i])+')_\mu  $ '
                     return False,logs
-    logs += 'El grupoide es conmutativo'
+    logs += 'El grupoide es conmutativo $(a,b)_\mu = (b,a)_\mu$'
     return True,logs
+
+def is_asociative(sett,op):
+    """
+    The function `is_asociative` checks if a given set with an operation is associative or not.
+
+    :param sett: The parameter "sett" represents a set of elements that form a groupoid. It could be a list, tuple, or any
+    other iterable containing the elements of the set
+    :param op: The parameter "op" represents the binary operation that is defined on the set "sett". The function
+    "is_asociative" checks if this binary operation is associative on the given set
+    :return: a tuple containing a boolean value and a string. The boolean value indicates whether the groupoid is
+    associative or not, and the string contains logs or messages related to the associativity of the groupoid.
+    """
+    logs = ''
+    for i in range(len(sett)):
+        for j in range(len(sett)):
+            for k in range(len(sett)):
+                if op(op(sett[i],sett[j]),sett[k]) == op(sett[i],op(sett[j],sett[k])):
+                    continue
+                else:
+                    logs += 'El grupoide no es Asociativo: \n'
+                    logs +=r'$(( '+ str(sett[i])+','+str(sett[j])+')_\mu,'+str(sett[k])+')_\mu   \noteq  '+r'( '+ str(sett[j])+',('+str(sett[i])+','+str(sett[k])+')_\mu)_\mu  $ '
+                    return False,logs
+    logs += 'El grupoide es Asociativo $((a,b)_\mu,c)_\mu = (a,(b,c)_\mu)_\mu$'
+    return True,logs
+
 
 def is_grupoid(table,sett,op):
     logs = ''
@@ -42,13 +111,21 @@ def is_grupoid(table,sett,op):
 
     '''
     isc = is_conmutative(sett,op)
-    return True,logs+isc[-1]
+
+    logs+= isc[1]+ r'''
+
+
+    '''
+
+    isas = is_asociative(sett,op)
+    logs+= isas[1]
+    return True,logs
 
 
 
 
-r = st.text_input('Ingrese los elementos :','{1,2,3}')
-fx = st.text_input('Ingrese la operacion binaria','x+y')
+r = st.text_input('Ingrese los elementos :','{0,1,2,3,4}')
+fx = st.text_input('Ingrese la operacion binaria','(x+y)%2')
 
 try:
     st.latex(r'\mu: G^{2} \rightarrow G')
