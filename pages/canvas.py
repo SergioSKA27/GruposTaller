@@ -19,11 +19,29 @@ import pytesseract
 import platform
 from code_editor import code_editor
 from streamlit_server_state import server_state, server_state_lock,force_rerun_bound_sessions
-
+from PIL import Image
 
 with open( "styles.css" ) as css:
     st.markdown( f'<style>{css.read()}</style>' , unsafe_allow_html= True)
 
+def get_image_download_link(img,filename,text):
+
+  """
+  The function `get_image_download_link` takes an image, filename, and text as input, converts the image to a base64
+  encoded string, and returns an HTML link that allows the user to download the image with the specified filename and
+  displays the specified text.
+
+  :param img: The `img` parameter is the image object that you want to convert to a download link
+  :param filename: The filename is the name that you want to give to the downloaded image file
+  :param text: The text parameter is the text that will be displayed as the link for downloading the image
+  :return: an HTML anchor tag (`<a>`) with a download link for an image. The link is encoded in base64 and includes the
+  image data, filename, and text to display for the link.
+  """
+  buffered = BytesIO()
+  img.save(buffered, format="JPEG")
+  img_str = base64.b64encode(buffered.getvalue()).decode()
+  href =  f'<a href="data:file/txt;base64,{img_str}" download="{filename}">{text}</a>'
+  return href
 
 
 
@@ -85,6 +103,11 @@ if canvas_result.image_data is not None:
 else :
   r = ''
 
+
+if st.button('Descargar ') or canvas_result.image_data is not None:
+    filename = st.text_input('Ingrese el nombre del archivo ','.jpg')
+    result = Image.fromarray(canvas_result.image_data);
+    st.markdown(get_image_download_link(result.convert('RGB'),filename,'Download '+filename))
 
 
 code1 = r'''
@@ -239,3 +262,5 @@ if editor0['type'] == "saved" and len(editor0['text']) != 0:
 st.subheader('Preview')
 
 st.write(editor0['text'])
+
+
