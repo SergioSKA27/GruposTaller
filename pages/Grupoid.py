@@ -7,7 +7,8 @@ import plotly.graph_objects as go
 import sympy as sp
 import re
 from itertools import permutations
-
+import os
+import base64
 
 
 
@@ -46,8 +47,67 @@ El orden de un groupoide $(G,\mu)$ es el número de elementos de $G$ denotado po
 es infinito y es finito si $|G|$ es finito.
 
 '''
+
+with st.expander('Nota:'):
+    textn = r'''
+Un grupo se puede considerar como un grupo de transformaciones de simetría que relaciona isomórficamente un objeto
+para sí mismo (las simetrías de un objeto, como las isometrías de un poliedro), un grupo es una colección de
+Transformaciones de simetría que actúan entre posiblemente más de un objeto.
+
+Por lo tanto, un grupo de groupoide consiste en un conjunto de objetos $x, y ,\ldots, z$ y para cada par de objetos $(x, y)$ hay un conjunto de
+transformaciones, generalmente denotadas por flechas
+    '''
+    st.write(textn)
+
+    st.latex(r"x \xrightarrow{f} y")
+
+    file_ = open("pages/Cdiag-removebg-preview.png", "rb")
+
+    st.write('que puede estar compuesto si son compuestos (es decir, si el primer termina donde el segundo comienza)')
+
+    contents = file_.read()
+    data_url = base64.b64encode(contents).decode("utf-8")
+    file_.close()
+
+
+    st.markdown(
+    f'<div style="text-align: center;"><img src="data:image/gif;base64,{data_url}" alt="galois"></div>',
+    unsafe_allow_html=True,
+    )
+
+    st.write('tal que esta composición es asociativa')
+
+
+    file1_ = open("pages/cdiag2-removebg-preview.png", "rb")
+    contents1 = file1_.read()
+    data_url1 = base64.b64encode(contents1).decode("utf-8")
+    file1_.close()
+
+
+    st.markdown(
+    f'<div style="text-align: center;"><img src="data:image/gif;base64,{data_url1}" alt="galois"></div>',
+    unsafe_allow_html=True,
+    )
+    text1 =r'''
+    y tal que para cada objeto $x$ hay transformación de identidad $x \xrightarrow{Id_X}x $.
+    En que este es un elemento neutral para la composición de las transformaciones, siempre que se define.
+
+    Hasta ahora, esta estructura es lo que se llama una categoría pequeña.Lo que hace que esto sea un grupo (pequeño) es que todos estos
+    Las transformaciones deben ser "simetrías" en el sentido de que son morfismos invertibles, lo que significa que para cada transformación
+    $x \xrightarrow{f} y$ hay una transformación al revés $y \xrightarrow{f^{-1}} x$, tal que
+
+    $$
+    f^{-1} \circ f = Id_{x}, f \circ f^{-1} = Id_{y}
+    $$
+
+    Si solo hay un objeto $X$, entonces esta definición se reduce a la de un grupo, y en este sentido groupoides
+    son "grupos con muchos objetos".Por el contrario, dado cualquier grupo de groupoides y la elección de uno de sus objetos $x$,
+    entonces la subcolección de transformaciones de $y$ a $x$ es un grupo, a veces llamado grupo de automorfismo $Aut_G(x)$ de $x$ en $G$.
+    '''
+    st.write(text1)
+
 st.subheader(':triangular_ruler:')
-def is_conmutative(sett,op):
+def is_conmutative(tabb,sett,op):
     """
     The function `is_conmutative` checks if a given set with a binary operation is commutative.
 
@@ -61,7 +121,7 @@ def is_conmutative(sett,op):
     logs = ''
     for i in range(len(sett)):
         for j in range(len(sett)):
-                if op(sett[i],sett[j]) == op(sett[j],sett[i]):
+                if tabb[i,j] == tabb[j,i]:
                     continue
                 else:
                     logs += 'El grupoide no es conmutativo: \n'
@@ -110,7 +170,7 @@ def is_grupoid(table,sett,op):
 
 
     '''
-    isc = is_conmutative(sett,op)
+    isc = is_conmutative(table,sett,op)
 
     logs+= isc[1]+ r'''
 
